@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_striker/db_helper.dart';
+import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/employee_detail_screen.dart';
 
-class AdminScreen extends StatelessWidget {
+class AdminScreen extends StatefulWidget {
+  AdminScreen({super.key});
+  @override
+  State<AdminScreen> createState() => _AdminScreenState();
+}
+
+class _AdminScreenState extends State<AdminScreen> {
   final List<String> employees = ['John Doe', 'Jane Smith'];
+  final db = DBHelper();
+  List<User> usersData = [];
 
-  AdminScreen({super.key}); // Example data
+  @override
+  void initState() {
+    // TODO: implement initState
+    db.database;
+    db.readAllUser().then((value) {
+      usersData = value;
+      log.w('Value is $usersData');
+      setState(() {});
+    });
+    super.initState();
+  }
 
+  // Example data
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,17 +43,17 @@ class AdminScreen extends StatelessWidget {
       ),
       drawer: _buildDrawer(context),
       body: ListView.builder(
-        itemCount: employees.length,
+        itemCount: usersData.length,
         itemBuilder: (context, index) {
           return Card(
             child: ListTile(
-              title: Text(employees[index]),
+              title: Text(usersData[index].username),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        EmployeeDetailScreen(employeeName: employees[index]),
+                        EmployeeDetailScreen(user: usersData[index]),
                   ),
                 );
               },

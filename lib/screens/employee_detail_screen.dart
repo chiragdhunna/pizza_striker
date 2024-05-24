@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_striker/logic/models/admin_model.dart';
+import 'package:pizza_striker/logic/models/user_model.dart';
 
 class EmployeeDetailScreen extends StatelessWidget {
-  final String employeeName;
+  User? user;
+  Admin? admin;
 
-  const EmployeeDetailScreen({super.key, required this.employeeName});
+  EmployeeDetailScreen({super.key, this.user, this.admin});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(employeeName),
+        title: Text(user!.name),
       ),
       body: Center(
-        child: Text('Details for $employeeName'),
+        child: Text('Details for $user'),
       ),
     );
   }
