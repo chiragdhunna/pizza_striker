@@ -136,7 +136,7 @@ class DBHelper {
 
   Future<List<Admin>> readAllAdmin() async {
     final db = await _instance.database;
-    const orderBy = 'created_time DESC';
+    const orderBy = 'id ASC';
     final result = await db.query('Admin', orderBy: orderBy);
     return result.map((json) => Admin.fromJson(json)).toList();
   }
