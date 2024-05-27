@@ -4,7 +4,7 @@ import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/employee_detail_screen.dart';
 
 class AdminScreen extends StatefulWidget {
-  AdminScreen({super.key});
+  const AdminScreen({super.key});
   @override
   State<AdminScreen> createState() => _AdminScreenState();
 }

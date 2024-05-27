@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
+import 'package:pizza_striker/db_helper.dart';
+import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
+import 'package:pizza_striker/screens/dash_board_screen.dart';
 import 'package:pizza_striker/screens/sign_up_screen.dart';
 
 Logger log = Logger(printer: PrettyPrinter());
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _controllerPassword = TextEditingController();
   bool _obscurePassword = true;
   String _userType = 'User'; // Updated userType variable
+  final db = DBHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 150),
               Text(
                 "Pizza Striker",
-                style: Theme.of(context).textTheme.headline4,
+                style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
               Text(
                 "Login to your account",
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 60),
@@ -54,7 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 onEditingComplete: () => _focusNodePassword.requestFocus(),
-                validator: (String? value) {},
+                validator: (String? value) {
+                  return null;
+                },
               ),
               const SizedBox(height: 10),
               TextFormField(
@@ -79,7 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                validator: (String? value) {},
+                validator: (String? value) {
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
               Container(
@@ -120,10 +128,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AdminScreen(),
+                        builder: (context) => const AdminScreen(),
                       ),
                     );
                   }
+
+                  final user = User(
+                    name: '',
+                    strikes: 0,
+                    email: '',
+                    password: _controllerPassword.text,
+                    username: _controllerUsername.text,
+                  );
+
+                  db.authenticationUser(user).then((value) {
+                    if (value != null) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => DashboardScreen(
+                            user: user,
+                          ),
+                        ),
+                      );
+                    } else {}
+                  });
                   if (_formKey.currentState?.validate() ?? false) {}
                 },
                 child: const Text("Login"),

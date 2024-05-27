@@ -1,10 +1,28 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/strike_details.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+String randomDates() {
+  final date = Random().nextInt(30);
+  final month = Random().nextInt(12);
+  // final year = Random().nextInt(2024) + 1900;
+  final year = 1900 + (Random(1).nextInt(2024 - 1900));
+  final randomDate = DateTime(year, month, date);
+  return DateFormat('yyyy-MM-dd - kk:mm').format(randomDate);
+}
 
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key, required this.user});
+
+  final User user;
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,27 +40,38 @@ class DashboardScreen extends StatelessWidget {
       drawer: _buildDrawer(context),
       body: Column(
         children: [
-          Expanded(
-            flex: 2,
-            child: SfCartesianChart(
-              primaryXAxis: const CategoryAxis(),
-              series: <LineSeries<SalesData, String>>[
-                LineSeries<SalesData, String>(
-                  dataSource: <SalesData>[
-                    SalesData('Mon', 35),
-                    SalesData('Tues', 28),
-                    SalesData('Wed', 34),
-                    SalesData('Thurs', 32),
-                    SalesData('Fri', 40),
-                    SalesData('Sat', 40)
-                  ],
-                  xValueMapper: (SalesData sales, _) => sales.year,
-                  yValueMapper: (SalesData sales, _) => sales.sales,
-                )
-              ],
+          const Text(
+            'Strike History',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 40,
             ),
           ),
-          Expanded(flex: 3, child: _buildStrikeList(context)),
+          const SizedBox(
+            height: 20,
+          ),
+          Expanded(
+            child: ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  final date = randomDates();
+                  return Card(
+                    child: ListTile(
+                      title: const Text('Reason'),
+                      leading: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              'https://picsum.photos/id/${Random().nextInt(500)}/200/300')),
+                      subtitle: const Text('Subtitle'),
+                      trailing: Text(date),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                StrikeDetailScreen(date: date, strikes: 1)));
+                      },
+                    ),
+                  );
+                }),
+          ),
         ],
       ),
     );
@@ -53,12 +82,37 @@ class DashboardScreen extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          DrawerHeader(
+            decoration: const BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text('Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        'https://picsum.photos/id/${Random().nextInt(500)}/200/300',
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      widget.user.username,
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.logout),

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:logger/web.dart';
 import 'package:pizza_striker/db_helper.dart';
 import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
+
+Logger log = Logger(
+  printer: PrettyPrinter(),
+);
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -69,7 +74,9 @@ class _SignupState extends State<Signup> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                validator: (String? value) {},
+                validator: (String? value) {
+                  return null;
+                },
                 onEditingComplete: () => _focusNodeEmail.requestFocus(),
               ),
               const SizedBox(height: 10),
@@ -223,7 +230,7 @@ class _SignupState extends State<Signup> {
                           ),
                         );
 
-                        _formKey.currentState?.reset();
+                        log.t('Pssword is ${_controllerPassword.text}');
 
                         if (_selectedUserType == 'User') {
                           final userData = User(
@@ -235,6 +242,8 @@ class _SignupState extends State<Signup> {
                           );
 
                           db.createUser(userData);
+                        } else {
+                          //  final adminData = Admin( name: _controllerUsername.text, phoneNumber: _con, createdAt: createdAt, updatedAt: updatedAt)
                         }
                         Navigator.pushReplacement(
                           context,
@@ -242,6 +251,7 @@ class _SignupState extends State<Signup> {
                             builder: (context) => const LoginScreen(),
                           ),
                         );
+                        _formKey.currentState?.reset();
                       }
                     },
                     child: const Text("Register"),

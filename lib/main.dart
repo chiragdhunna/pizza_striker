@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_striker/db_helper.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
-import 'package:pizza_striker/screens/dash_board_screen.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
 
 void main() {
@@ -19,8 +18,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),
-        '/dashboard': (context) => const DashboardScreen(),
-        '/admin': (context) => AdminScreen(),
+        '/admin': (context) => const AdminScreen(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

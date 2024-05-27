@@ -1,12 +1,12 @@
 class Admin {
-  final int id;
+  final int? id;
   final String name;
   final String phoneNumber;
   final String createdAt;
   final String updatedAt;
 
   Admin({
-    required this.id,
+    this.id,
     required this.name,
     required this.phoneNumber,
     required this.createdAt,

@@ -33,12 +33,13 @@ class User {
     required String password,
   }) =>
       User(
-          id: this.id,
-          name: this.name,
-          strikes: this.strikes,
-          username: this.username,
-          password: this.password,
-          email: this.email);
+        id: this.id,
+        name: this.name,
+        strikes: this.strikes,
+        username: this.username,
+        password: this.password,
+        email: this.email,
+      );
 
   factory User.fromJson(Map<String, Object?> json) => User(
         id: json['id'] as int,

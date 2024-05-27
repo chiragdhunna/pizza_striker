@@ -179,6 +179,37 @@ class DBHelper {
     );
   }
 
+  Future<List<Map<String, Object?>>?> authenticationUser(User user) async {
+    try {
+      final db = await _instance.database;
+      final res = await db.rawQuery(
+          "SELECT * FROM USER WHERE username = ? and password = ?",
+          [user.username, user.password]);
+/*       final res = await db.rawQuery("SELECT * from USER"); */
+      log.t('res :$res');
+      if (res.isNotEmpty) {
+        return res;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      log.e(e);
+    }
+    return null;
+  }
+
+/*   Future<bool> authenticationAdmin(Admin admin) async {
+    final db = await _instance.database;
+    final res = await db.rawQuery(
+        "SELECT * FROM user WHERE username = ${admin.username} and password = ${admin.password}");
+
+    if (res.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  } */
+
   Future close() async {
     final db = await _instance.database;
     db.close();
