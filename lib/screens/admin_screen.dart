@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_striker/db_helper.dart';
-import 'package:pizza_striker/logic/models/user_model.dart';
+import 'package:pizza_striker/logic/older_models/old_user_model.dart';
 import 'package:pizza_striker/screens/employee_detail_screen.dart';
 
 class AdminScreen extends StatefulWidget {

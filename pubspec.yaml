@@ -40,7 +40,20 @@ dependencies:
   path_to_regexp: ^0.4.0
   dio: ^5.4.3+1
   bloc: ^8.1.4
-  logger: ^2.3.0
+  logger: ^2.4.0
+  freezed: ^2.5.7
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  intl: ^0.19.0
+  retrofit: ^4.4.1
+  retrofit_generator: ^9.1.2
+  json_serializable: ^6.8.0
+  pretty_dio_logger: ^1.4.0
+  dio_smart_retry: ^6.0.0
+  flutter_secure_storage: ^4.2.1
+  dio_brotli_transformer: ^2.0.0
+  awesome_notifications: ^0.9.3+1
+  awesome_notifications_fcm: ^0.9.3+1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +65,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  build_runner: ^2.4.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:pizza_striker/logic/models/user_model.dart';
 import 'package:pizza_striker/screens/strike_details.dart';
 import 'package:intl/intl.dart';
+
+import '../logic/older_models/old_user_model.dart';
 
 String randomDates() {
   final date = Random().nextInt(30);

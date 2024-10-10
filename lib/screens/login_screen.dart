@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
 import 'package:pizza_striker/db_helper.dart';
-import 'package:pizza_striker/logic/models/user_model.dart';
+import 'package:pizza_striker/logic/api/user/models/user_model.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
 import 'package:pizza_striker/screens/dash_board_screen.dart';
 import 'package:pizza_striker/screens/sign_up_screen.dart';
+
+import '../logic/older_models/old_user_model.dart';
 
 Logger log = Logger(printer: PrettyPrinter());
 

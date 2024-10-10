@@ -1,7 +1,8 @@
 import 'package:logger/web.dart';
-import 'package:pizza_striker/logic/models/admin_model.dart';
-import 'package:pizza_striker/logic/models/user_model.dart';
+import 'package:pizza_striker/logic/older_models/admin_model.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'logic/older_models/old_user_model.dart';
 
 const List<String> userValues = ['id', 'name', 'strikes', 'created_time'];
 
