@@ -13,7 +13,7 @@ part 'full_user_model.g.dart';
 class FullUserModel with _$FullUserModel {
   const factory FullUserModel({
     required String accessToken,
-    required UserModel user,
+    UserModel? user,
   }) = _FullUserModel;
 
   factory FullUserModel.fromJson(Map<String, Object?> json) =>

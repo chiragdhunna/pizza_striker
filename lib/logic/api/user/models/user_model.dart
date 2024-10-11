@@ -12,8 +12,8 @@ part 'user_model.g.dart';
 class UserModel with _$UserModel {
   const factory UserModel({
     required String id,
-    required String name,
-    required String profilePhoto,
+    String? name,
+    String? profilePhoto,
     required String phone,
     required String createdAt,
     required String strikeCount,

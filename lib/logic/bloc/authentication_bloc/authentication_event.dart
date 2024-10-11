@@ -22,11 +22,4 @@ class AuthenticationEvent with _$AuthenticationEvent {
   }) = _AdminIsInReviewEvent;
 
   const factory AuthenticationEvent.logout() = _Logout;
-
-  const factory AuthenticationEvent.adminProfileUpdate({
-    required AdminModel admin,
-  }) = _AdminProfileUpdated;
-  const factory AuthenticationEvent.userProfileUpdate({
-    required UserModel userModel,
-  }) = _UserProfileUpdated;
 }

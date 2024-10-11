@@ -1,12 +1,9 @@
 import 'dart:convert';
 
-import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/web.dart';
 import 'package:pizza_striker/logic/api/admin/admin_api.dart';
-import 'package:pizza_striker/logic/api/admin/models/admin_device_token_model.dart';
 import 'package:pizza_striker/logic/api/admin/models/admin_model.dart';
-import 'package:pizza_striker/logic/api/devices/models/user_device_token_model.dart';
 import 'package:pizza_striker/logic/api/user/models/user_model.dart';
 import 'package:pizza_striker/logic/api/user/user_api.dart';
 import 'package:pizza_striker/logic/bloc/authentication_bloc/authentication_bloc.dart';
@@ -31,26 +28,15 @@ class AuthRepository {
   final UserApi userApi;
 
   Future<void> logout() async {
-    final userDeviceToken = UserDeviceTokenModel(
-      deviceToken: await AwesomeNotificationsFcm().requestFirebaseAppToken(),
-    );
-
-    final adminDeviceToken = AdminDeviceTokenModel(
-      deviceToken: await AwesomeNotificationsFcm().requestFirebaseAppToken(),
-    );
-
-    log.d('Device Token While Logging Out : $userDeviceToken');
     if (AuthenticationBloc().isAuthUser()) {
       try {
-        await userApi.logout(userDeviceToken);
+        await userApi.logout();
       } catch (e) {
-        log
-          ..e('Error in Logout user : $e')
-          ..e('Device Token is : $userDeviceToken');
+        log.e('Error in Logout user : $e');
       }
     } else if (AuthenticationBloc().isAuthAdmin()) {
       try {
-        await adminApi.logout(adminDeviceToken);
+        await adminApi.logout();
       } catch (e) {
         log.e('Error in Logout admin : $e');
       }

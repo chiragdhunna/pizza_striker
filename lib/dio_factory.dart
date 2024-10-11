@@ -3,9 +3,10 @@ import 'package:dio_brotli_transformer/dio_brotli_transformer.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:pizza_striker/api_base.dart';
 
 class DioFactory {
-  DioFactory({this.baseUrl = ''});
+  DioFactory({this.baseUrl = apiBase});
 
   final String baseUrl;
 
@@ -18,17 +19,17 @@ class DioFactory {
   Dio create() {
     final dio = Dio(_configureOptions());
 
+    dio.options.contentType = Headers.jsonContentType;
+
     dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      request: true,
       requestBody: true,
-      responseBody: true,
-      responseHeader: true,
+      requestHeader: true,
       compact: false,
     ));
 
     dio.interceptors.add(RetryInterceptor(
       dio: dio,
+      logPrint: print,
       retries: 3,
       retryDelays: [
         Duration.zero,
@@ -36,8 +37,8 @@ class DioFactory {
     ));
 
     dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        final authToken = getAuthToken();
+      onRequest: (options, handler) async {
+        final authToken = await getAuthToken();
 
         if (authToken != null) {
           options.headers['Authorization'] = 'Bearer $authToken';
@@ -45,7 +46,8 @@ class DioFactory {
 
         return handler.next(options);
       },
-      onError: (error, handler) {
+      onError: (DioException error, handler) async {
+        // todo: will finish this
         return handler.next(error);
       },
     ));
@@ -55,13 +57,19 @@ class DioFactory {
     return dio;
   }
 
-  BaseOptions _configureOptions() {
-    return BaseOptions(
-      baseUrl: baseUrl,
-      receiveTimeout: const Duration(seconds: 150),
-      connectTimeout: const Duration(seconds: 150),
-      sendTimeout: const Duration(seconds: 150),
-      headers: <String, dynamic>{'accept-encoding': 'br'},
-    );
-  }
+  BaseOptions _configureOptions() => BaseOptions(
+        baseUrl: baseUrl,
+        receiveTimeout: const Duration(
+          milliseconds: 15000,
+        ),
+        connectTimeout: const Duration(
+          milliseconds: 15000,
+        ),
+        sendTimeout: const Duration(
+          milliseconds: 15000,
+        ),
+        headers: <String, dynamic>{
+          'accept-encoding': 'br',
+        },
+      );
 }

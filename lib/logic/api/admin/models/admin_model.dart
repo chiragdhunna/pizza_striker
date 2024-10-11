@@ -19,6 +19,7 @@ class AdminModel with _$AdminModel {
     required String strikeCount,
     required String updatedAt,
     required String hashedPassword,
+    required bool isActive,
   }) = _AdminModel;
 
   factory AdminModel.fromJson(Map<String, Object?> json) =>

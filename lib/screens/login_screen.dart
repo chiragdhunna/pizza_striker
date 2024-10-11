@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
 import 'package:pizza_striker/db_helper.dart';
-import 'package:pizza_striker/logic/api/user/models/user_model.dart';
+import 'package:pizza_striker/logic/api/user/models/user_type.dart';
+import 'package:pizza_striker/logic/bloc/login_bloc/bloc/login_bloc.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
-import 'package:pizza_striker/screens/dash_board_screen.dart';
 import 'package:pizza_striker/screens/sign_up_screen.dart';
-
-import '../logic/older_models/old_user_model.dart';
 
 Logger log = Logger(printer: PrettyPrinter());
 
@@ -51,9 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 60),
               TextFormField(
                 controller: _controllerUsername,
-                keyboardType: TextInputType.name,
+                keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  labelText: "Username",
+                  labelText: "Phone Number",
                   prefixIcon: const Icon(Icons.person_outline),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -134,27 +132,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
                   }
+                  try {
+                    LoginBloc().add(
+                      LoginEvent.verifyLogin(
+                        userType: _userType != 'Admin'
+                            ? UserType.user
+                            : UserType.admin,
+                        phone: _controllerUsername.text,
+                        otp: _controllerPassword.text,
+                        attempts: 0,
+                      ),
+                    );
 
-                  final user = User(
-                    name: '',
-                    strikes: 0,
-                    email: '',
-                    password: _controllerPassword.text,
-                    username: _controllerUsername.text,
-                  );
-
-                  db.authenticationUser(user).then((value) {
-                    if (value != null) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => DashboardScreen(
-                            user: user,
-                          ),
-                        ),
-                      );
-                    } else {}
-                  });
-                  if (_formKey.currentState?.validate() ?? false) {}
+                    _controllerUsername.clear();
+                    _controllerPassword.clear();
+                  } catch (e) {
+                    log.e('Error while logging In : $e');
+                  }
                 },
                 child: const Text("Login"),
               ),

@@ -2,7 +2,7 @@ name: pizza_striker
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: ">=3.3.4 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
@@ -39,6 +38,9 @@ dependencies:
   sqflite: ^2.3.3+1
   path_to_regexp: ^0.4.0
   dio: ^5.4.3+1
+  dio_smart_retry: ^6.0.0
+  dio_brotli_transformer: ^2.0.0
+  pretty_dio_logger: ^1.4.0
   bloc: ^8.1.4
   logger: ^2.4.0
   freezed: ^2.5.7
@@ -48,14 +50,15 @@ dependencies:
   retrofit: ^4.4.1
   retrofit_generator: ^9.1.2
   json_serializable: ^6.8.0
-  pretty_dio_logger: ^1.4.0
-  dio_smart_retry: ^6.0.0
   flutter_secure_storage: ^4.2.1
-  dio_brotli_transformer: ^2.0.0
-  awesome_notifications: ^0.9.3+1
-  awesome_notifications_fcm: ^0.9.3+1
+  meta: ^1.15.0
+  build_runner: ^2.4.13
+  freeze: ^1.0.0
 
 dev_dependencies:
+  build_runner: ^2.4.5
+  json_serializable: ^6.5.4
+
   flutter_test:
     sdk: flutter
 
@@ -65,14 +68,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
-  build_runner: ^2.4.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -108,3 +109,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+global_options:
+  freezed:
+    runs_before:
+      - json_serializable
+  json_serializable:
+    runs_before:
+      - retrofit_generator
