@@ -1,173 +1,223 @@
 import 'package:flutter/material.dart';
-import 'package:logger/web.dart';
-import 'package:pizza_striker/db_helper.dart';
-import 'package:pizza_striker/logic/api/user/models/user_type.dart';
-import 'package:pizza_striker/logic/bloc/login_bloc/bloc/login_bloc.dart';
-import 'package:pizza_striker/screens/admin_screen.dart';
-import 'package:pizza_striker/screens/sign_up_screen.dart';
-
-Logger log = Logger(printer: PrettyPrinter());
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FocusNode _focusNodePassword = FocusNode();
-  final TextEditingController _controllerUsername = TextEditingController();
-  final TextEditingController _controllerPassword = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  String _userType = 'User'; // Updated userType variable
-  final db = DBHelper();
+  String _userType = 'Admin'; // Default selection
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      backgroundColor: Colors.grey[50],
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 150),
-              Text(
-                "Pizza Striker",
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "Login to your account",
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
+              const SizedBox(height: 80),
+              // Logo
+              CircleAvatar(
+                radius: 70,
+                backgroundColor: Colors.transparent,
+                child: Image.asset(
+                  'assets/pizza_striker_logo.png',
+                  width: 140,
+                  height: 140,
+                ),
               ),
               const SizedBox(height: 60),
-              TextFormField(
-                controller: _controllerUsername,
-                keyboardType: TextInputType.phone,
+
+              // Username/Email field
+              TextField(
+                controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: "Phone Number",
-                  prefixIcon: const Icon(Icons.person_outline),
+                  hintText: 'Username or email',
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 20.0,
                   ),
                 ),
-                onEditingComplete: () => _focusNodePassword.requestFocus(),
-                validator: (String? value) {
-                  return null;
-                },
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerPassword,
-                focusNode: _focusNodePassword,
+              const SizedBox(height: 16),
+
+              // Password field
+              TextField(
+                controller: _passwordController,
                 obscureText: _obscurePassword,
-                keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
-                  labelText: "Password",
-                  prefixIcon: const Icon(Icons.password_outlined),
+                  hintText: 'Password',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 20.0,
+                  ),
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
                       });
                     },
-                    icon: _obscurePassword
-                        ? const Icon(Icons.visibility_outlined)
-                        : const Icon(Icons.visibility_off_outlined),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.grey,
+                    ),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey),
-                ),
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: _userType,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _userType = newValue!;
-                    });
-                  },
-                  items: <String>['User', 'Admin']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
                 ),
               ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed: () {
-                  if (_controllerUsername.text == 'admin' &&
-                      _controllerPassword.text == 'admin' &&
-                      _userType == 'Admin') {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminScreen(),
-                      ),
-                    );
-                  }
-                  try {
-                    LoginBloc().add(
-                      LoginEvent.verifyLogin(
-                        userType: _userType != 'Admin'
-                            ? UserType.user
-                            : UserType.admin,
-                        phone: _controllerUsername.text,
-                        otp: _controllerPassword.text,
-                        attempts: 0,
-                      ),
-                    );
+              const SizedBox(height: 24),
 
-                    _controllerUsername.clear();
-                    _controllerPassword.clear();
-                  } catch (e) {
-                    log.e('Error while logging In : $e');
-                  }
-                },
-                child: const Text("Login"),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don't have an account?"),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const Signup(),
-                        ),
-                      );
-                    },
-                    child: const Text("Signup"),
+              // Login button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Login logic here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE84D15), // Orange color
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ],
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // User type selection
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _userType = 'Admin';
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: _userType == 'Admin'
+                                ? Colors.transparent
+                                : Colors.transparent,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _userType == 'Admin'
+                                      ? const Color(0xFFE84D15)
+                                      : Colors.grey.shade300,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Admin',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 30,
+                      color: Colors.grey.shade300,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _userType = 'Employee';
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: _userType == 'Employee'
+                                ? Colors.transparent
+                                : Colors.transparent,
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _userType == 'Employee'
+                                      ? const Color(0xFFE84D15)
+                                      : Colors.grey.shade300,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Employee',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -178,9 +228,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _focusNodePassword.dispose();
-    _controllerUsername.dispose();
-    _controllerPassword.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 }
