@@ -50,7 +50,7 @@ dependencies:
   retrofit: ^4.4.1
   retrofit_generator: ^9.1.2
   json_serializable: ^6.8.0
-  flutter_secure_storage: ^4.2.1
+  flutter_secure_storage: ^8.0.0
   meta: ^1.15.0
   build_runner: ^2.4.13
   freeze: ^1.0.0

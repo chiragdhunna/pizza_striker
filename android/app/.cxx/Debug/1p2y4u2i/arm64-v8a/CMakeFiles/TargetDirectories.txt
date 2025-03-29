@@ -1,0 +1,2 @@
+C:/Users/chira/Desktop/Docs/Github Projects/pizza_striker/android/app/.cxx/Debug/1p2y4u2i/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/chira/Desktop/Docs/Github Projects/pizza_striker/android/app/.cxx/Debug/1p2y4u2i/arm64-v8a/CMakeFiles/rebuild_cache.dir
