@@ -3,7 +3,9 @@ name: 🚀 Fastlane Android Beta
 on:
   push:
     branches:
-      - main # Change if you want to trigger from a different branch
+      - main
+    tags:
+      - "v*.*.*" # Match tags like v1.0.0, v2.3.4 etc.
 
 jobs:
   build-and-distribute:
@@ -56,6 +58,7 @@ jobs:
           bundle exec fastlane android beta
 
       - name: 📤 Upload APK to GitHub Releases
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
