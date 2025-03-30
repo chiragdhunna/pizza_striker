@@ -1,0 +1,53 @@
+name: 🚀 Fastlane Android Beta
+
+on:
+  push:
+    branches:
+      - main # Change if you want to trigger from a different branch
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    env:
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    steps:
+      - name: 🔁 Checkout Code
+        uses: actions/checkout@v3
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.1"
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🛠️ Run build_runner for Freezed
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: 🔐 Decode and Place Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
+
+      - name: 🔧 Install Fastlane
+        run: |
+          cd android
+          gem install bundler:2.4.22
+          bundle install
+
+      - name: 🚀 Run Fastlane `android beta`
+        run: |
+          cd android
+          bundle exec fastlane android beta
