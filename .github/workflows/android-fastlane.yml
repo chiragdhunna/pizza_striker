@@ -41,13 +41,16 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
 
-      - name: 🔧 Install Fastlane
+      - name: 🔧 Setup Fastlane
+        working-directory: android
         run: |
-          cd android
-          gem install bundler:2.4.22
+          gem install --user-install bundler
+          export PATH="$HOME/.gem/ruby/$(ls $HOME/.gem/ruby)/bin:$PATH"
+          bundle config set --local path 'vendor/bundle'
           bundle install
 
       - name: 🚀 Run Fastlane `android beta`
+        working-directory: android
         run: |
-          cd android
+          export PATH="$HOME/.gem/ruby/$(ls $HOME/.gem/ruby)/bin:$PATH"
           bundle exec fastlane android beta
