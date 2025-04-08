@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:pizza_striker/screens/sign_up_screen.dart';
 import 'package:pizza_striker/services/theme_service.dart';
@@ -7,7 +6,7 @@ import 'package:pizza_striker/services/theme_service.dart';
 Logger log = Logger(printer: PrettyPrinter());
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -48,11 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: scaffoldBgColor,
       extendBodyBehindAppBar: true,
-      // appBar: AppBar(
-      //   // backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
-      //   backgroundColor: Colors.green,
-      //   automaticallyImplyLeading: false,
-      // ),
       appBar: PreferredSize(
         preferredSize:
             const Size.fromHeight(0), // or try 1 if 0 causes layout issues
@@ -64,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
           toolbarHeight: 0, // removes any toolbar render space
         ),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -188,8 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
                               bottomLeft: Radius.circular(12),
                             ),
@@ -235,8 +228,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
                               topRight: Radius.circular(12),
                               bottomRight: Radius.circular(12),
                             ),
