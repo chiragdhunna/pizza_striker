@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pizza_striker/db_helper.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
@@ -9,10 +10,28 @@ void main() async {
 
   await DBHelper().initDb();
 
-  // can be null
-  final bool? isDarkMode = await ThemeService.loadThemeFromPrefs();
+  // Initial system UI mode
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+  );
+
+  final isDarkMode = await ThemeService.loadThemeFromPrefs();
 
   runApp(MyApp(isDarkMode: isDarkMode));
+
+  // 💥 Force the system UI AFTER first frame — guaranteed to work
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+    );
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // change to light if dark bg
+    ));
+  });
 }
 
 class MyApp extends StatelessWidget {

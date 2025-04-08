@@ -3,12 +3,14 @@
     <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+        <!-- 🔥 REMOVE THIS LINE -->
+        <!-- <item name="android:windowFullscreen">true</item> -->
     </style>
 
     <!-- Normal theme: used once Flutter is loaded -->
     <style name="NormalTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+        <!-- 🔥 REMOVE THIS LINE -->
+        <!-- <item name="android:windowFullscreen">true</item> -->
     </style>
 </resources>
