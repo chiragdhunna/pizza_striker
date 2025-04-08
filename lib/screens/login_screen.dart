@@ -24,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
     // Post-frame callback ensures context is fully initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final isDark = ThemeService.isDarkMode(context);
-      log.w('isDarkMode (PostFrame): $isDark');
     });
   }
 
