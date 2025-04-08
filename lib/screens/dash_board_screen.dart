@@ -103,22 +103,36 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // First pizza slice (filled)
-                          _buildPizzaSlice(true, primaryColor),
+                          if (widget.user.strikes >= 2)
+                            _buildPizzaSlice(
+                                false, primaryColor.withOpacity(0.3),
+                                small: true)
+                          else
+                            const SizedBox(
+                                width: 44), // Spacer when left slice is absent
+
                           const SizedBox(width: 8),
-                          // Empty pizza slices
+
                           _buildPizzaSlice(
-                              false, primaryColor.withOpacity(0.3)),
+                              true, primaryColor), // Center (filled)
+
                           const SizedBox(width: 8),
-                          _buildPizzaSlice(
-                              false, primaryColor.withOpacity(0.3)),
+
+                          if (widget.user.strikes == 1 ||
+                              widget.user.strikes == 2)
+                            _buildPizzaSlice(
+                                false, primaryColor.withOpacity(0.3),
+                                small: true)
+                          else
+                            const SizedBox(
+                                width: 44), // Spacer when right slice is absent
                         ],
                       ),
                       const SizedBox(height: 8),
                       // Strike count
                       Center(
                         child: Text(
-                          '1',
+                          widget.user.strikes.toString(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -169,41 +183,6 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
               ),
 
               const SizedBox(height: 24),
-
-              // // Owes Pizza section
-              // Card(
-              //   color: cardBackgroundColor,
-              //   elevation: 4,
-              //   shape: RoundedRectangleBorder(
-              //     borderRadius: BorderRadius.circular(16),
-              //   ),
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(16.0),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         Text(
-              //           'Owes Pizza',
-              //           style: TextStyle(
-              //             fontSize: 24,
-              //             fontWeight: FontWeight.bold,
-              //             color: primaryColor,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 16),
-              //         // Person who is owed pizza
-              //         Text(
-              //           'Alice Smith',
-              //           style: TextStyle(
-              //             fontSize: 18,
-              //             fontWeight: FontWeight.w500,
-              //             color: textColor,
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -293,10 +272,10 @@ class PizzaPainter extends CustomPainter {
   }
 }
 
-Widget _buildPizzaSlice(bool isFilled, Color color) {
+Widget _buildPizzaSlice(bool isFilled, Color color, {bool small = false}) {
   return SizedBox(
-    width: 60,
-    height: 60,
+    width: small ? 44 : 60,
+    height: small ? 44 : 60,
     child: CustomPaint(
       painter: isFilled ? FilledPizzaSlicePainter() : EmptyPizzaSlicePainter(),
     ),

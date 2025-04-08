@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         '/dashboardScreen': (context) => const EmployeeDashboard(
               user: User(
                 name: 'name',
-                strikes: 3,
+                strikes: 1,
                 email: 'email',
                 password: 'password',
                 username: 'John Doe',
