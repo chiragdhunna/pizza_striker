@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:pizza_striker/db_helper.dart';
-import 'package:pizza_striker/logic/api/user/models/user_model.dart';
 import 'package:pizza_striker/logic/older_models/old_user_model.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
 
@@ -52,8 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ? const Color(0xFF252A3A) // Darker input field in dark mode
         : const Color(0xFFF8F9FD); // Light gray in light mode
 
-    final buttonColor =
-        const Color(0xFFEE5730); // Orange button for both themes
+    const buttonColor = Color(0xFFEE5730); // Orange button for both themes
 
     final textColor = isDarkMode ? Colors.white : Colors.black87;
 
@@ -341,7 +339,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           builder: (context) => const LoginScreen(),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Login",
                         style: TextStyle(
                           color: buttonColor,
@@ -409,6 +407,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     // Navigate to login screen
     Future.delayed(const Duration(milliseconds: 1500), () {
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),
