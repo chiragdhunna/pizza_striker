@@ -105,6 +105,18 @@ class _AdminScreenState extends State<AdminScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(0), // or try 1 if 0 causes layout issues
+        child: AppBar(
+          backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+          shadowColor: Colors.transparent, // eliminate elevation shadow
+          surfaceTintColor: Colors.transparent, // for Material 3 themes
+          elevation: 0, // no shadow
+          toolbarHeight: 0, // removes any toolbar render space
+        ),
+      ),
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.white,
       body: SafeArea(
         child: Padding(
@@ -180,66 +192,62 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildLogo(bool isDarkMode) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isDarkMode ? const Color(0xFF252525) : const Color(0xFFFEEBD0),
-        border: Border.all(
-          color: isDarkMode ? Colors.transparent : Colors.grey.shade300,
-          width: 1,
-        ),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.local_pizza,
-            color: const Color(0xFFFF6B00),
-            size: 24,
-          ),
-          Transform.rotate(
-            angle: 2.3, // Approximately 135 degrees
-            child: Container(
-              width: 40,
-              height: 2,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ],
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: const Color.fromARGB(0, 107, 107, 107),
+      child: Image.asset(
+        isDarkMode
+            ? 'assets/pizza_striker_logo_dark.png'
+            : 'assets/pizza_striker_logo_light.png',
+        width: 40,
+        height: 40,
       ),
     );
   }
 
   Widget _buildSearchBar(bool isDarkMode) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(
-          color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300,
-          width: 1,
-        ),
+    return TextField(
+      controller: searchController,
+      onChanged: filterUsers,
+      style: TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
+        fontSize: 16,
       ),
-      child: TextField(
-        controller: searchController,
-        onChanged: filterUsers,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor:
+            isDarkMode ? const Color(0xFF1E2733) : const Color(0xFFF5F5F5),
+        hintText: 'Search employees',
+        hintStyle: TextStyle(
+          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+          fontSize: 16,
         ),
-        decoration: InputDecoration(
-          hintText: 'Search employees',
-          hintStyle: TextStyle(
-            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade500,
+        prefixIcon: Icon(
+          Icons.search,
+          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+          size: 22,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.transparent : Colors.black,
+            width: 1.2,
           ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade500,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.grey.shade500 : Colors.black,
+            width: 1.2,
           ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 15),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.transparent : Colors.black,
+            width: 1.2,
+          ),
         ),
       ),
     );
@@ -336,6 +344,7 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
 
               // Add Strike button
+
               ElevatedButton(
                 onPressed: () => addStrike(UserNewModel),
                 style: ElevatedButton.styleFrom(
