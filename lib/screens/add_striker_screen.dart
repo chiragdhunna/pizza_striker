@@ -11,7 +11,8 @@ class AddStrikerScreen extends StatefulWidget {
 class _AddStrikerScreenState extends State<AddStrikerScreen> {
   final TextEditingController _reasonController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  bool _isThirdStrike = true;
+  int _strikeCount =
+      2; // Default to 2 strikes (showing the third strike warning)
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -47,26 +48,31 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Define colors based on theme
-    final backgroundColor = isDarkMode ? const Color(0xFF1A2138) : Colors.white;
-    final cardColor = isDarkMode ? const Color(0xFF273049) : Colors.white;
+    // Define colors based on theme with corrected values
+    final backgroundColor = isDarkMode ? const Color(0xFF0F1729) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black;
     final subtitleColor = isDarkMode ? Colors.white70 : Colors.grey;
     final inputBgColor =
-        isDarkMode ? const Color(0xFF273049) : const Color(0xFFF7F7F7);
+        isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF7F7F7);
     final warningBgColor =
         isDarkMode ? const Color(0xFF3D2A2A) : const Color(0xFFFEEDED);
     final buttonColor = const Color(0xFFFF5D32);
     final buttonTextColor = Colors.white;
     final borderColor = isDarkMode ? Colors.transparent : Colors.black12;
 
+    // Avatar background colors
+    final avatarBgColor = isDarkMode
+        ? const Color(0xFF1E293B) // Corrected dark theme avatar background
+        : const Color(0xFFFCE4DE); // Light theme avatar background
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
-        shadowColor: Colors.transparent, // eliminate elevation shadow
-        surfaceTintColor: Colors.transparent, // for Material 3 themes
-        elevation: 0, // no shadow
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         title: Center(
           child: Text(
             'Add Strike',
@@ -77,7 +83,10 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
             ),
           ),
         ),
-        automaticallyImplyLeading: false,
+        centerTitle: !isDarkMode, // Center title only in light mode
+
+        automaticallyImplyLeading:
+            false, // Only use default back button in dark mode
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -90,9 +99,29 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
                 child: Column(
                   children: [
                     // Profile Image
-                    isDarkMode
-                        ? _buildCircleAvatar("John", isDarkMode)
-                        : _buildCircleAvatar("Jane", isDarkMode),
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: avatarBgColor,
+                      child: ClipOval(
+                        child: Image.asset(
+                          isDarkMode
+                              ? 'assets/profile_placeholder.png'
+                              : 'assets/profile_placeholder_female.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.person,
+                              size: 40,
+                              color: isDarkMode
+                                  ? Colors.white.withOpacity(0.7)
+                                  : Colors.orange[300],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
 
                     const SizedBox(height: 12),
 
@@ -108,9 +137,9 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
 
                     const SizedBox(height: 4),
 
-                    // Current Strikes
+                    // Current Strikes with centered pizza slices
                     Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (!isDarkMode)
                           Text(
@@ -123,7 +152,7 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
                         const SizedBox(width: 8),
                         const Text('🍕', style: TextStyle(fontSize: 18)),
                         const Text('🍕', style: TextStyle(fontSize: 18)),
-                        if (isDarkMode)
+                        if (_strikeCount == 3)
                           const Text('🍕', style: TextStyle(fontSize: 18)),
                       ],
                     ),
@@ -167,50 +196,13 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
 
               const SizedBox(height: 16),
 
-              // Warning Message
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: warningBgColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: const Color(0xFFFF5D32),
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "This will be the employee's third strike.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : const Color(0xFFFF5D32),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: const [
-                              Text('🍕', style: TextStyle(fontSize: 18)),
-                              Text('🍕', style: TextStyle(fontSize: 18)),
-                              Text('🍕', style: TextStyle(fontSize: 18)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Warning Messages based on strike count
+              if (_strikeCount == 2) // Show warning for third strike
+                _buildWarningMessage(isDarkMode, warningBgColor,
+                    "This will be the employee's third strike.")
+              else if (_strikeCount == 3) // Already has 3 strikes
+                _buildWarningMessage(isDarkMode, warningBgColor,
+                    "Employee already owes the pizza."),
 
               const SizedBox(height: 16),
 
@@ -251,7 +243,8 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
                 ),
               ),
 
-              if (isDarkMode) ...[
+              // Only show notifications section when strike count is 2
+              if (isDarkMode && _strikeCount == 2) ...[
                 const SizedBox(height: 24),
 
                 // Notifications Section
@@ -328,49 +321,48 @@ class _AddStrikerScreenState extends State<AddStrikerScreen> {
     );
   }
 
-  Widget _buildCircleAvatar(String name, bool isDarkMode) {
-    if (isDarkMode) {
-      // For dark mode (John's profile)
-      return CircleAvatar(
-        radius: 40,
-        backgroundColor: const Color(0xFF152033),
-        child: ClipOval(
-          child: Image.asset(
-            'assets/profile_placeholder.png', // Replace with your actual asset
-            width: 80,
-            height: 80,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(
-                Icons.person,
-                size: 40,
-                color: Colors.white.withOpacity(0.7),
-              );
-            },
+  Widget _buildWarningMessage(bool isDarkMode, Color bgColor, String message) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.warning_amber_rounded,
+            color: const Color(0xFFFF5D32),
+            size: 24,
           ),
-        ),
-      );
-    } else {
-      // For light mode (Jane's profile)
-      return CircleAvatar(
-        radius: 40,
-        backgroundColor: const Color(0xFFFCE4DE),
-        child: ClipOval(
-          child: Image.asset(
-            'assets/profile_placeholder_female.png', // Replace with your actual asset
-            width: 80,
-            height: 80,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(
-                Icons.person,
-                size: 40,
-                color: Colors.orange[300],
-              );
-            },
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : const Color(0xFFFF5D32),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    Text('🍕', style: TextStyle(fontSize: 18)),
+                    Text('🍕', style: TextStyle(fontSize: 18)),
+                    Text('🍕', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    }
+        ],
+      ),
+    );
   }
 }
