@@ -373,38 +373,53 @@ class FilledPizzaSlicePainter extends CustomPainter {
 class EmptyPizzaSlicePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Pizza base triangle
+    // 🍕 Pizza base triangle
     Path trianglePath = Path()
-      ..moveTo(0, 0) // Top left
-      ..lineTo(size.width, 0) // Top right
-      ..lineTo(size.width / 2, size.height) // Bottom middle
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
       ..close();
 
-    // Based on image, the empty slice is dark gray
-    final Paint pizzaBasePaint = Paint()
-      ..color = const Color(0xFF333333)
+    final Paint basePaint = Paint()
+      ..color = const Color(0xFF333333) // dark gray base
       ..style = PaintingStyle.fill;
 
-    // Draw pizza base
-    canvas.drawPath(trianglePath, pizzaBasePaint);
+    canvas.drawPath(trianglePath, basePaint);
 
-    // Draw crust border - slightly darker than base
-    final Paint crustPaint = Paint()
-      ..color = const Color(0xFF222222)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0;
-
-    Path crustPath = Path()
+    // 🍞 Outer curved crust (same path as filled)
+    final Path crustPath = Path()
       ..moveTo(0, 0)
-      ..quadraticBezierTo(
-          size.width / 2,
-          -size.height * 0.2, // control point
-          size.width,
-          0 // end point
-          );
+      ..quadraticBezierTo(size.width / 2, -size.height * 0.2, size.width, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0)
+      ..close();
+
+    final Paint crustPaint = Paint()
+      ..color = const Color(0xFF333333) // same as base to blend
+      ..style = PaintingStyle.fill;
+
     canvas.drawPath(crustPath, crustPaint);
 
-    // Draw pepperoni circle outlines
+    // 🧀 Clip to keep inner line inside triangle
+    canvas.save();
+    canvas.clipPath(trianglePath);
+
+    // 🍊 Inner curved line (darker gray)
+    final Path innerCrustLine = Path()
+      ..moveTo(0, size.height * 0.18)
+      ..quadraticBezierTo(
+          size.width / 2, -size.height * 0.05, size.width, size.height * 0.18);
+
+    final Paint innerCrustPaint = Paint()
+      ..color = const Color(0xFF555555) // visible dark gray
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(innerCrustLine, innerCrustPaint);
+    canvas.restore();
+
+    // 🍩 Pepperoni outlines (lighter gray)
     final Paint pepperoniPaint = Paint()
       ..color = const Color(0xFF444444)
       ..style = PaintingStyle.fill;
