@@ -143,7 +143,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     // Login logic here
-                    Navigator.pushNamed(context, '/admin');
+                    if (_userType == "Admin") {
+                      Navigator.pushNamed(context, '/admin');
+                    } else {
+                      Navigator.pushNamed(context, '/dashboardScreen');
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE84D15), // Orange color

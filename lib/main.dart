@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
       themeMode: isDarkMode == null
           ? ThemeMode.system
           : (isDarkMode! ? ThemeMode.dark : ThemeMode.light),
-      initialRoute: '/dashboardScreen',
+      initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),
         '/admin': (context) => const AdminScreen(),
