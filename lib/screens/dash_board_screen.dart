@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../logic/older_models/old_user_model.dart';
-import 'package:pizza_striker/screens/strike_details.dart';
 
 class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key, required this.user});
