@@ -572,6 +572,16 @@ class _LoginScreenState extends State<LoginScreen> {
   String _userType = 'Admin'; // Default selection
 
   @override
+  void initState() {
+    super.initState();
+    // Post-frame callback ensures context is fully initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isDark = ThemeService.isDarkMode(context);
+      log.w('isDarkMode (PostFrame): $isDark');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Get current theme mode
     final isDarkMode = ThemeService.isDarkMode(context);
