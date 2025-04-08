@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pizza_striker/db_helper.dart';
 import 'package:pizza_striker/screens/admin_screen.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
+import 'package:pizza_striker/screens/sign_up_screen.dart';
 import 'package:pizza_striker/services/theme_service.dart';
 
 void main() async {
@@ -48,10 +49,11 @@ class MyApp extends StatelessWidget {
       themeMode: isDarkMode == null
           ? ThemeMode.system
           : (isDarkMode! ? ThemeMode.dark : ThemeMode.light),
-      initialRoute: '/',
+      initialRoute: '/signUpScreen',
       routes: {
         '/': (context) => const LoginScreen(),
         '/admin': (context) => const AdminScreen(),
+        '/signUpScreen': (context) => const SignUpScreen(),
       },
     );
   }

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:logger/web.dart';
+import 'package:logger/logger.dart';
 import 'package:pizza_striker/db_helper.dart';
 import 'package:pizza_striker/logic/api/user/models/user_model.dart';
+import 'package:pizza_striker/logic/older_models/old_user_model.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
-
-import '../logic/older_models/old_user_model.dart';
-
-Logger log = Logger(
-  printer: PrettyPrinter(),
-);
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -23,18 +18,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final FocusNode _focusNodeEmail = FocusNode();
   final FocusNode _focusNodePassword = FocusNode();
   final FocusNode _focusNodeConfirmPassword = FocusNode();
-  final TextEditingController _controllerUsername = TextEditingController();
+  final TextEditingController _controllerFullName = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerConFirmPassword =
+  final TextEditingController _controllerConfirmPassword =
       TextEditingController();
 
   final db = DBHelper();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
-  // List of user types
-  final List<String> _userTypes = ['User', 'Admin'];
-  String? _selectedUserType;
+  // For role selection
+  String _selectedRole = 'Admin'; // Default selected role
+
+  final Logger _logger = Logger();
 
   @override
   void initState() {
@@ -44,239 +41,408 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    // Colors based on theme mode
+    final backgroundColor = isDarkMode
+        ? const Color(0xFF1A1F2E) // Dark navy background
+        : Colors.white;
+
+    final inputFieldColor = isDarkMode
+        ? const Color(0xFF252A3A) // Darker input field in dark mode
+        : const Color(0xFFF8F9FD); // Light gray in light mode
+
+    final buttonColor =
+        const Color(0xFFEE5730); // Orange button for both themes
+
+    final textColor = isDarkMode ? Colors.white : Colors.black87;
+
+    final hintTextColor = isDarkMode ? Colors.white70 : Colors.black54;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      backgroundColor: backgroundColor,
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(0), // or try 1 if 0 causes layout issues
+        child: AppBar(
+          backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+          shadowColor: Colors.transparent, // eliminate elevation shadow
+          surfaceTintColor: Colors.transparent, // for Material 3 themes
+          elevation: 0, // no shadow
+          toolbarHeight: 0, // removes any toolbar render space
+        ),
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 100),
-              Text(
-                "Register",
-                style: Theme.of(context).textTheme.headlineLarge,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "Create your account",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 35),
-              TextFormField(
-                controller: _controllerUsername,
-                keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                  labelText: "Username",
-                  prefixIcon: const Icon(Icons.person_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                // Logo
+                Center(
+                  child: SizedBox(
+                    width: 140,
+                    height: 140,
+                    child: Image.asset(isDarkMode
+                        ? 'assets/pizza_striker_logo_dark.png'
+                        : 'assets/pizza_striker_logo_light.png'),
                   ),
                 ),
-                validator: (String? value) {
-                  return null;
-                },
-                onEditingComplete: () => _focusNodeEmail.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerEmail,
-                focusNode: _focusNodeEmail,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+
+                const SizedBox(height: 20),
+                Text(
+                  "Register",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter email.";
-                  } else if (!(value.contains('@') && value.contains('.'))) {
-                    return "Invalid email";
-                  }
-                  return null;
-                },
-                onEditingComplete: () => _focusNodePassword.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: "User Type",
-                  prefixIcon: const Icon(Icons.person_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 30),
+
+                // Full name field
+                TextField(
+                  controller: _controllerFullName,
+                  style: TextStyle(color: textColor),
+                  decoration: InputDecoration(
+                    hintText: "Full name",
+                    hintStyle: TextStyle(color: hintTextColor),
+                    filled: true,
+                    fillColor: inputFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  onEditingComplete: () => _focusNodeEmail.requestFocus(),
                 ),
-                value: _selectedUserType,
-                items: _userTypes.map((String userType) {
-                  return DropdownMenuItem<String>(
-                    value: userType,
-                    child: Text(userType),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedUserType = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select a user type.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerPassword,
-                obscureText: _obscurePassword,
-                focusNode: _focusNodePassword,
-                keyboardType: TextInputType.visiblePassword,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  prefixIcon: const Icon(Icons.password_outlined),
-                  suffixIcon: IconButton(
+                const SizedBox(height: 16),
+
+                // Email field
+                TextField(
+                  controller: _controllerEmail,
+                  focusNode: _focusNodeEmail,
+                  style: TextStyle(color: textColor),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: "Email",
+                    hintStyle: TextStyle(color: hintTextColor),
+                    filled: true,
+                    fillColor: inputFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                  ),
+                  onEditingComplete: () => _focusNodePassword.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                // Password field
+                TextField(
+                  controller: _controllerPassword,
+                  focusNode: _focusNodePassword,
+                  style: TextStyle(color: textColor),
+                  obscureText: _obscurePassword,
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    hintStyle: TextStyle(color: hintTextColor),
+                    filled: true,
+                    fillColor: inputFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
                         });
                       },
-                      icon: _obscurePassword
-                          ? const Icon(Icons.visibility_outlined)
-                          : const Icon(Icons.visibility_off_outlined)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter password.";
-                  } else if (value.length < 8) {
-                    return "Password must be at least 8 character.";
-                  }
-                  return null;
-                },
-                onEditingComplete: () =>
-                    _focusNodeConfirmPassword.requestFocus(),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _controllerConFirmPassword,
-                obscureText: _obscurePassword,
-                focusNode: _focusNodeConfirmPassword,
-                keyboardType: TextInputType.visiblePassword,
-                decoration: InputDecoration(
-                  labelText: "Confirm Password",
-                  prefixIcon: const Icon(Icons.password_outlined),
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      icon: _obscurePassword
-                          ? const Icon(Icons.visibility_outlined)
-                          : const Icon(Icons.visibility_off_outlined)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter password.";
-                  } else if (value != _controllerPassword.text) {
-                    return "Password doesn't match.";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 50),
-              Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: hintTextColor,
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            width: 200,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            content: const Text("Registered Successfully"),
-                          ),
-                        );
-
-                        log.t('Pssword is ${_controllerPassword.text}');
-
-                        if (_selectedUserType == 'User') {
-                          final userData = User(
-                            name: _controllerUsername.text,
-                            strikes: 0,
-                            email: _controllerEmail.text,
-                            password: _controllerPassword.text,
-                            username: _controllerUsername.text,
-                          );
-
-                          db.createUser(userData);
-                        } else {
-                          //  final adminData = Admin( name: _controllerUsername.text, phoneNumber: _con, createdAt: createdAt, updatedAt: updatedAt)
-                        }
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
-                        _formKey.currentState?.reset();
-                      }
-                    },
-                    child: const Text("Register"),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Already have an account?"),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                  onEditingComplete: () =>
+                      _focusNodeConfirmPassword.requestFocus(),
+                ),
+                const SizedBox(height: 16),
+
+                // Confirm password field
+                TextField(
+                  controller: _controllerConfirmPassword,
+                  focusNode: _focusNodeConfirmPassword,
+                  style: TextStyle(color: textColor),
+                  obscureText: _obscureConfirmPassword,
+                  decoration: InputDecoration(
+                    hintText: "Confirm Password",
+                    hintStyle: TextStyle(color: hintTextColor),
+                    filled: true,
+                    fillColor: inputFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: hintTextColor,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // Role selection
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 8),
+                      child: Text(
+                        "Role",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedRole = 'Admin';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _selectedRole == 'Admin'
+                                    ? buttonColor.withOpacity(0.2)
+                                    : inputFieldColor,
+                                borderRadius: BorderRadius.circular(10),
+                                border: _selectedRole == 'Admin'
+                                    ? Border.all(color: buttonColor, width: 2)
+                                    : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Admin",
+                                  style: TextStyle(
+                                    color: _selectedRole == 'Admin'
+                                        ? buttonColor
+                                        : textColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        child: const Text("Login"),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedRole = 'Employee';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _selectedRole == 'Employee'
+                                    ? buttonColor.withOpacity(0.2)
+                                    : inputFieldColor,
+                                borderRadius: BorderRadius.circular(10),
+                                border: _selectedRole == 'Employee'
+                                    ? Border.all(color: buttonColor, width: 2)
+                                    : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Employee",
+                                  style: TextStyle(
+                                    color: _selectedRole == 'Employee'
+                                        ? buttonColor
+                                        : textColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Register button
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _handleRegistration,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "REGISTER",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+
+                // Login link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: TextStyle(color: textColor),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      ),
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                          color: buttonColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _handleRegistration() {
+    // Basic validation
+    if (_controllerFullName.text.isEmpty) {
+      _showErrorSnackBar('Please enter your full name');
+      return;
+    }
+
+    if (_controllerEmail.text.isEmpty ||
+        !(_controllerEmail.text.contains('@') &&
+            _controllerEmail.text.contains('.'))) {
+      _showErrorSnackBar('Please enter a valid email address');
+      return;
+    }
+
+    if (_controllerPassword.text.isEmpty ||
+        _controllerPassword.text.length < 8) {
+      _showErrorSnackBar('Password must be at least 8 characters');
+      return;
+    }
+
+    if (_controllerPassword.text != _controllerConfirmPassword.text) {
+      _showErrorSnackBar('Passwords do not match');
+      return;
+    }
+
+    // Registration success
+    _logger.i('Registering user: ${_controllerEmail.text} as $_selectedRole');
+
+    if (_selectedRole == 'Employee') {
+      final userData = User(
+        name: _controllerFullName.text,
+        strikes: 0,
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+        username: _controllerFullName.text,
+      );
+
+      db.createUser(userData);
+    } else {
+      // Handle admin registration
+      // Implementation pending for admin data model
+      _logger.i('Admin registration logic to be implemented');
+    }
+
+    _showSuccessSnackBar('Registration successful!');
+
+    // Navigate to login screen
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    });
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: const EdgeInsets.all(10),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: const EdgeInsets.all(10),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -286,10 +452,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _focusNodeEmail.dispose();
     _focusNodePassword.dispose();
     _focusNodeConfirmPassword.dispose();
-    _controllerUsername.dispose();
+    _controllerFullName.dispose();
     _controllerEmail.dispose();
     _controllerPassword.dispose();
-    _controllerConFirmPassword.dispose();
+    _controllerConfirmPassword.dispose();
     super.dispose();
   }
 }

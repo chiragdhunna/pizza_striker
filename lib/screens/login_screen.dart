@@ -48,9 +48,23 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: scaffoldBgColor,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+      // appBar: AppBar(
+      //   // backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+      //   backgroundColor: Colors.green,
+      //   automaticallyImplyLeading: false,
+      // ),
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(0), // or try 1 if 0 causes layout issues
+        child: AppBar(
+          backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+          shadowColor: Colors.transparent, // eliminate elevation shadow
+          surfaceTintColor: Colors.transparent, // for Material 3 themes
+          elevation: 0, // no shadow
+          toolbarHeight: 0, // removes any toolbar render space
+        ),
       ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
