@@ -307,38 +307,34 @@ Widget _buildPizzaSlice(bool isFilled, Color color) {
 class FilledPizzaSlicePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Pizza base triangle
-    Path trianglePath = Path()
-      ..moveTo(0, 0) // Top left
-      ..lineTo(size.width, 0) // Top right
-      ..lineTo(size.width / 2, size.height) // Bottom middle
+    // Main pizza triangle
+    final Path trianglePath = Path()
+      ..moveTo(0, 0) // top left
+      ..lineTo(size.width, 0) // top right
+      ..lineTo(size.width / 2, size.height) // bottom center
       ..close();
 
-    // Base pizza color - orange
-    final Paint pizzaBasePaint = Paint()
-      ..color = const Color(0xFFFF9B34)
+    final Paint basePaint = Paint()
+      ..color = const Color(0xFFFF9B34) // pizza body
       ..style = PaintingStyle.fill;
 
-    // Draw pizza base
-    canvas.drawPath(trianglePath, pizzaBasePaint);
+    canvas.drawPath(trianglePath, basePaint);
 
-    // Draw crust border at the bottom
-    final Paint crustPaint = Paint()
-      ..color = const Color(0xFFDD5D28)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0;
-
-    Path crustPath = Path()
+    // Draw crust as a separate curved shape overlay
+    final Path crustPath = Path()
       ..moveTo(0, 0)
-      ..quadraticBezierTo(
-          size.width / 2,
-          -size.height * 0.2, // control point
-          size.width,
-          0 // end point
-          );
+      ..quadraticBezierTo(size.width / 2, -size.height * 0.2, size.width, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0)
+      ..close();
+
+    final Paint crustPaint = Paint()
+      ..color = const Color(0xFFFF9B34) // darker crust color
+      ..style = PaintingStyle.fill;
+
     canvas.drawPath(crustPath, crustPaint);
 
-    // Draw pepperoni toppings
+    // Pepperoni
     final Paint pepperoniPaint = Paint()
       ..color = const Color(0xFFD73C26)
       ..style = PaintingStyle.fill;
