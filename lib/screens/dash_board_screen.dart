@@ -303,24 +303,23 @@ Widget _buildPizzaSlice(bool isFilled, Color color) {
   );
 }
 
-// Pizza slice painter for filled slices
 class FilledPizzaSlicePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Main pizza triangle
+    // 🍕 Main pizza triangle
     final Path trianglePath = Path()
-      ..moveTo(0, 0) // top left
-      ..lineTo(size.width, 0) // top right
-      ..lineTo(size.width / 2, size.height) // bottom center
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
       ..close();
 
     final Paint basePaint = Paint()
-      ..color = const Color(0xFFFF9B34) // pizza body
+      ..color = const Color(0xFFFF9B34)
       ..style = PaintingStyle.fill;
 
     canvas.drawPath(trianglePath, basePaint);
 
-    // Draw crust as a separate curved shape overlay
+    // 🍞 Draw outer curved crust (overlay on top of triangle)
     final Path crustPath = Path()
       ..moveTo(0, 0)
       ..quadraticBezierTo(size.width / 2, -size.height * 0.2, size.width, 0)
@@ -329,12 +328,31 @@ class FilledPizzaSlicePainter extends CustomPainter {
       ..close();
 
     final Paint crustPaint = Paint()
-      ..color = const Color(0xFFFF9B34) // darker crust color
+      ..color = const Color(0xFFFF9B34)
       ..style = PaintingStyle.fill;
 
     canvas.drawPath(crustPath, crustPaint);
 
-    // Pepperoni
+    // 🧀 Clip to triangle so crust line stays inside
+    canvas.save(); // Start clip
+    canvas.clipPath(trianglePath);
+
+    // 🍊 More curved and lower inner crust line
+    final Path innerCrustLine = Path()
+      ..moveTo(0, size.height * 0.18)
+      ..quadraticBezierTo(
+          size.width / 2, -size.height * 0.05, size.width, size.height * 0.18);
+
+    final Paint innerCrustPaint = Paint()
+      ..color = const Color(0xFFF47C25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(innerCrustLine, innerCrustPaint);
+    canvas.restore(); // End clip
+
+    // 🍅 Pepperoni
     final Paint pepperoniPaint = Paint()
       ..color = const Color(0xFFD73C26)
       ..style = PaintingStyle.fill;
