@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
+import 'package:pizza_striker/screens/sign_up_screen.dart';
+import 'package:pizza_striker/services/theme_service.dart';
+
+Logger log = Logger(printer: PrettyPrinter());
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,35 +20,68 @@ class _LoginScreenState extends State<LoginScreen> {
   String _userType = 'Admin'; // Default selection
 
   @override
+  void initState() {
+    super.initState();
+    // Post-frame callback ensures context is fully initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isDark = ThemeService.isDarkMode(context);
+      log.w('isDarkMode (PostFrame): $isDark');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Get current theme mode
+    final isDarkMode = ThemeService.isDarkMode(context);
+
+    // Colors based on theme
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final secondaryTextColor = isDarkMode ? Colors.grey[400] : Colors.grey;
+    final scaffoldBgColor =
+        isDarkMode ? const Color(0xFF121823) : Colors.grey[50];
+    final inputBgColor = isDarkMode ? const Color(0xFF1E2A38) : Colors.white;
+    final dividerColor =
+        isDarkMode ? const Color(0xFF2A3547) : Colors.grey.shade300;
+    final unselectedCircleColor =
+        isDarkMode ? const Color(0xFF2A3547) : Colors.grey.shade300;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: scaffoldBgColor,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.transparent : Colors.white,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 40),
               // Logo
               CircleAvatar(
                 radius: 70,
-                backgroundColor: Colors.transparent,
+                backgroundColor: const Color.fromARGB(0, 107, 107, 107),
                 child: Image.asset(
-                  'assets/pizza_striker_logo.png',
+                  isDarkMode
+                      ? 'assets/pizza_striker_logo_dark.png'
+                      : 'assets/pizza_striker_logo_light.png',
                   width: 140,
                   height: 140,
                 ),
               ),
+
               const SizedBox(height: 60),
 
               // Username/Email field
               TextField(
                 controller: _usernameController,
+                style: TextStyle(color: textColor),
                 decoration: InputDecoration(
                   hintText: 'Username or email',
+                  hintStyle: TextStyle(color: secondaryTextColor),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: inputBgColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -59,10 +98,12 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
+                style: TextStyle(color: textColor),
                 decoration: InputDecoration(
                   hintText: 'Password',
+                  hintStyle: TextStyle(color: secondaryTextColor),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: inputBgColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -81,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _obscurePassword
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
-                      color: Colors.grey,
+                      color: secondaryTextColor,
                     ),
                   ),
                 ),
@@ -95,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     // Login logic here
+                    Navigator.pushNamed(context, '/admin');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE84D15), // Orange color
@@ -118,8 +160,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
-                  color: Colors.white,
+                  border: Border.all(color: dividerColor),
+                  color: inputBgColor,
                 ),
                 child: Row(
                   children: [
@@ -133,9 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: _userType == 'Admin'
-                                ? Colors.transparent
-                                : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
                               bottomLeft: Radius.circular(12),
@@ -151,15 +190,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   shape: BoxShape.circle,
                                   color: _userType == 'Admin'
                                       ? const Color(0xFFE84D15)
-                                      : Colors.grey.shade300,
+                                      : unselectedCircleColor,
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              const Text(
+                              Text(
                                 'Admin',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: textColor,
                                 ),
                               ),
                             ],
@@ -170,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       width: 1,
                       height: 30,
-                      color: Colors.grey.shade300,
+                      color: dividerColor,
                     ),
                     Expanded(
                       child: GestureDetector(
@@ -182,9 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: _userType == 'Employee'
-                                ? Colors.transparent
-                                : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                               topRight: Radius.circular(12),
                               bottomRight: Radius.circular(12),
@@ -200,15 +237,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   shape: BoxShape.circle,
                                   color: _userType == 'Employee'
                                       ? const Color(0xFFE84D15)
-                                      : Colors.grey.shade300,
+                                      : unselectedCircleColor,
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              const Text(
+                              Text(
                                 'Employee',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: textColor,
                                 ),
                               ),
                             ],
@@ -218,6 +256,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 24),
+
+              // Sign up text button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to sign up screen
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUpScreen()));
+                    },
+                    child: const Text(
+                      "Sign up",
+                      style: TextStyle(
+                        color: Color(0xFFE84D15),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

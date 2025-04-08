@@ -10,14 +10,14 @@ Logger log = Logger(
   printer: PrettyPrinter(),
 );
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignupState extends State<Signup> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   final FocusNode _focusNodeEmail = FocusNode();
