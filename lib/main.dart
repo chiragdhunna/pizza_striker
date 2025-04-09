@@ -7,6 +7,7 @@ import 'package:pizza_striker/screens/dash_board_screen.dart';
 import 'package:pizza_striker/screens/employee_detail_screen.dart';
 import 'package:pizza_striker/screens/login_screen.dart';
 import 'package:pizza_striker/screens/sign_up_screen.dart';
+import 'package:pizza_striker/screens/team_status_screen.dart';
 import 'package:pizza_striker/services/theme_service.dart';
 import 'package:pizza_striker/logic/older_models/old_user_model.dart';
 
@@ -53,12 +54,13 @@ class MyApp extends StatelessWidget {
       themeMode: isDarkMode == null
           ? ThemeMode.system
           : (isDarkMode! ? ThemeMode.dark : ThemeMode.light),
-      initialRoute: '/',
+      initialRoute: '/teamStatusScreen',
       routes: {
         '/': (context) => const LoginScreen(),
         '/admin': (context) => const AdminScreen(),
         '/signUpScreen': (context) => const SignUpScreen(),
         '/employeeDashboard': (context) => EmployeeDetailScreen(),
+        '/teamStatusScreen': (context) => const TeamStatusScreen(),
         '/dashboardScreen': (context) => const EmployeeDashboard(
               user: User(
                 name: 'name',
