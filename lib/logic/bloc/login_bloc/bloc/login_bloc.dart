@@ -61,15 +61,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     try {
       if (event.userType == UserType.user) {
-        log.w('User is Type');
         final loggedInUser = await _userApi.login(
           LoginUserModel(
             phone: event.phone,
             hashedPassword: event.otp,
           ),
         );
-
-        log.w('Data Success : $loggedInUser');
 
         emit(
           LoginState.loginUserSuccess(
@@ -92,8 +89,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             hashedPassword: event.otp,
           ),
         );
-
-        log.w('Admin is Type');
 
         emit(
           LoginState.loginAdminSuccess(

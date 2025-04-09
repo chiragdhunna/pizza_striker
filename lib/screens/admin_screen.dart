@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_striker/screens/add_striker_screen.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -78,25 +79,32 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   void addStrike(UserNewModel UserNewModel) {
-    setState(() {
-      // Find and update the UserNewModel in the original list
-      final index = usersData.indexWhere((u) => u.id == UserNewModel.id);
-      if (index != -1) {
-        usersData[index] =
-            UserNewModel.copyWith(strikes: UserNewModel.strikes + 1);
+    // setState(() {
+    //   // Find and update the UserNewModel in the original list
+    //   final index = usersData.indexWhere((u) => u.id == UserNewModel.id);
+    //   if (index != -1) {
+    //     usersData[index] =
+    //         UserNewModel.copyWith(strikes: UserNewModel.strikes + 1);
 
-        // Re-apply the current filter
-        String currentSearchText = searchController.text;
-        if (currentSearchText.isNotEmpty) {
-          filterUsers(currentSearchText);
-        } else {
-          filteredUsers = List.from(usersData);
-        }
+    //     // Re-apply the current filter
+    //     String currentSearchText = searchController.text;
+    //     if (currentSearchText.isNotEmpty) {
+    //       filterUsers(currentSearchText);
+    //     } else {
+    //       filteredUsers = List.from(usersData);
+    //     }
 
-        // Update the owes pizza section
-        updateOwesPizzaUsers();
-      }
-    });
+    //     // Update the owes pizza section
+    //     updateOwesPizzaUsers();
+    //   }
+    // });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddStrikerScreen(),
+      ),
+    );
   }
 
   @override
