@@ -8,6 +8,8 @@ on:
 jobs:
   distribute:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -33,3 +35,23 @@ jobs:
           groups: testers
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: "CI build ${{ github.sha }}"
+
+      - name: Get commit message
+        id: commit
+        run: |
+          MSG=$(git log -1 --pretty=%B)
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "Build ${{ github.run_number }}"
+          body: |
+            Commit: ${{ github.sha }}
+
+            ${{ steps.commit.outputs.message }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}
