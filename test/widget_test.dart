@@ -7,15 +7,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pizza_striker/app.dart';
 
 import 'package:pizza_striker/main.dart';
-import 'package:pizza_striker/services/theme_service.dart';
+import 'package:pizza_striker/services/api_client.dart';
+import 'package:pizza_striker/state/auth_provider.dart';
+import 'package:pizza_striker/state/settings_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  final prefs = await SharedPreferences.getInstance();
+  final api = ApiClient();
+  final auth = AuthProvider(api: api);
+  final settings = SettingsProvider(prefs);
+
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    final isDarkMode = await ThemeService.loadThemeFromPrefs();
-    await tester.pumpWidget(MyApp(isDarkMode: isDarkMode));
+    await tester
+        .pumpWidget(PizzaStrikerApp(api: api, auth: auth, settings: settings));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

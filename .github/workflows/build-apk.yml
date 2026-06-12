@@ -1,0 +1,48 @@
+name: Build APK
+
+# Builds a release APK with the backend URL injected from a GitHub secret.
+# Add the secret first: repo → Settings → Secrets and variables → Actions →
+#   New repository secret → name: API_BASE_URL
+#   value: https://pizza-striker-backend-bmu6.onrender.com
+#
+# Run it: Actions tab → "Build APK" → Run workflow (or push a tag like v1.0.0).
+# This assumes the Flutter project is at the repository root.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: >
+          flutter build apk --release
+          --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
