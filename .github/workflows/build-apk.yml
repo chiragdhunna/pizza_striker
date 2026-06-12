@@ -1,48 +1,30 @@
-name: Build APK
-
-# Builds a release APK with the backend URL injected from a GitHub secret.
-# Add the secret first: repo → Settings → Secrets and variables → Actions →
-#   New repository secret → name: API_BASE_URL
-#   value: https://pizza-striker-backend-bmu6.onrender.com
-#
-# Run it: Actions tab → "Build APK" → Run workflow (or push a tag like v1.0.0).
-# This assumes the Flutter project is at the repository root.
+name: Distribute to Testers
 
 on:
-  workflow_dispatch:
   push:
-    tags: ["v*"]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-apk:
+  distribute:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: "3.27.1" # ← set to your local `flutter --version`
           cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build release APK
-        run: >
-          flutter build apk --release
-          --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - run: flutter pub get
+      - run: flutter build apk --release --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
+      - name: Distribute to Firebase testers
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "CI build ${{ github.sha }}"
