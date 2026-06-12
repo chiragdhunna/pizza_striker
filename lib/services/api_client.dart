@@ -27,9 +27,11 @@ class ApiClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl ?? AppConfig.baseUrl,
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        sendTimeout: const Duration(seconds: 15),
+        // Generous timeouts so the first request after a free-tier cold start
+        // (Render sleeps the service after ~15 min idle) doesn't fail.
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
         headers: {'Content-Type': 'application/json'},
         // We inspect status codes ourselves instead of letting Dio throw.
         validateStatus: (_) => true,

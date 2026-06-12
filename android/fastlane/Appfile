@@ -1,2 +1,3 @@
-json_key_file("") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
-package_name("com.example.pizza_striker") # e.g. com.krausefx.app
+# Must match the applicationId in android/app/build.gradle(.kts).
+# `flutter create` defaults to com.example.<project_name>.
+package_name("com.example.pizza_striker")

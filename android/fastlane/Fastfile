@@ -1,20 +1,52 @@
+# Fastlane lanes for building the Pizza Striker Android app.
+#
+# Run from the project root:
+#   cd android
+#   fastlane build_apk
+#
+# Point at your deployed backend (one of):
+#   fastlane build_apk api_base:https://pizza-striker-api.onrender.com
+#   API_BASE_URL=https://pizza-striker-api.onrender.com fastlane build_apk
+#
+# The URL is baked into the build via --dart-define=API_BASE_URL=… , which the
+# app reads in lib/config/app_config.dart.
+
 default_platform(:android)
 
+# Flutter project root: .../android/fastlane -> up two levels.
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+
+def run_flutter(command)
+  Dir.chdir(PROJECT_ROOT) { sh(command) }
+end
+
+def resolve_api_base(options)
+  options[:api_base] || ENV["API_BASE_URL"] || "https://YOUR-BACKEND.onrender.com"
+end
+
 platform :android do
-  desc "Build and distribute Android app to Firebase App Distribution"
-  lane :beta do
+  desc "Build a RELEASE APK with the backend URL baked in"
+  lane :build_apk do |options|
+    url = resolve_api_base(options)
+    UI.message("🍕 Building release APK against #{url}")
+    run_flutter("flutter pub get")
+    run_flutter("flutter build apk --release --dart-define=API_BASE_URL=#{url}")
+    UI.success("APK ready → build/app/outputs/flutter-apk/app-release.apk")
+  end
 
-    # Clean Flutter build
-    sh("flutter clean")
+  desc "Build a DEBUG APK (faster; debug-signed)"
+  lane :build_apk_debug do |options|
+    url = resolve_api_base(options)
+    run_flutter("flutter pub get")
+    run_flutter("flutter build apk --debug --dart-define=API_BASE_URL=#{url}")
+    UI.success("APK ready → build/app/outputs/flutter-apk/app-debug.apk")
+  end
 
-    # Build Flutter APK (Release)
-    sh("flutter build apk --release")
-
-    # Distribute APK via Firebase App Distribution
-    firebase_app_distribution(
-      app: "1:580856308707:android:727fc6db6b8988693176d6",
-      groups: "internal-testers",
-      apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
-    )
+  desc "Build a RELEASE App Bundle (.aab) for the Play Store"
+  lane :build_aab do |options|
+    url = resolve_api_base(options)
+    run_flutter("flutter pub get")
+    run_flutter("flutter build appbundle --release --dart-define=API_BASE_URL=#{url}")
+    UI.success("AAB ready → build/app/outputs/bundle/release/app-release.aab")
   end
 end
