@@ -1,3 +1,0 @@
-# Must match the applicationId in android/app/build.gradle(.kts).
-# `flutter create` defaults to com.example.<project_name>.
-package_name("com.example.pizza_striker")
